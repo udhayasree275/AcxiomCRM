@@ -1,32 +1,34 @@
 @echo off
 set PATH=%~dp0..\.git_tools\cmd;%PATH%
+title Push AcxiomCRM to GitHub
 echo ========================================================
-echo Push AcxiomCRM to GitHub
+echo Pushing AcxiomCRM to:
+echo https://github.com/udhayasree275/AcxiomCRM.git
 echo ========================================================
 echo.
-set /p REPO_URL="Enter your GitHub Repository URL (e.g., https://github.com/YOUR_USERNAME/AcxiomCRM.git): "
-if "%REPO_URL%"=="" (
-    echo No repository URL provided. Aborting.
-    pause
-    exit /b 1
-)
 
-echo Adding remote origin...
+cd /d "%~dp0"
 git remote remove origin 2>nul
-git remote add origin %REPO_URL%
+git remote add origin https://github.com/udhayasree275/AcxiomCRM.git
 git branch -M main
 
+echo Starting push to GitHub...
+echo (If a GitHub sign-in window appears in your browser, please approve it)
 echo.
-echo Pushing main branch to GitHub...
 git push -u origin main
 
 if %errorlevel% equ 0 (
     echo.
     echo ========================================================
-    echo [SUCCESS] Successfully pushed to GitHub!
+    echo [SUCCESS] Code successfully pushed to GitHub!
+    echo Visit: https://github.com/udhayasree275/AcxiomCRM
     echo ========================================================
 ) else (
     echo.
-    echo [FAILED] Push failed. Please check your credentials or GitHub Personal Access Token.
+    echo ========================================================
+    echo [NOTICE] If prompted for authentication, you can also use
+    echo a GitHub Personal Access Token (PAT).
+    echo ========================================================
 )
+echo.
 pause
