@@ -1,0 +1,22 @@
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+<script>
+    // Custom Client-Side Business Validation Rules
+    $(function () {
+        // 1. Phone validation: 10 digits
+        $.validator.addMethod("phone10digits", function (value, element) {
+            if (this.optional(element)) return true;
+            return /^[0-9]{10}$/.test(value);
+        }, "Enter a valid 10-digit phone number.");
+
+        // 2. Future or today date validation
+        $.validator.addMethod("notInPast", function (value, element) {
+            if (this.optional(element)) return true;
+            const inputDate = new Date(value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return inputDate >= today;
+        }, "Date cannot be in the past.");
+    });
+</script>

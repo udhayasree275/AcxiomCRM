@@ -1,0 +1,78 @@
+@model AcxiomCRM.ViewModels.ConversionReportViewModel
+@{
+    ViewData["Title"] = "Sales Conversion Report";
+}
+
+<partial name="_ReportHeader" />
+
+<div class="row g-4 mb-4">
+    <!-- Lead Conversion Card -->
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 border-bottom">
+                <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-funnel-fill text-primary me-2"></i>Lead Conversion Ratios</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center my-3">
+                    <span class="display-4 fw-bold text-primary">@Model.LeadConversionRate%</span>
+                    <div class="text-muted small">Lead to Customer Conversion Rate</div>
+                </div>
+                <table class="table table-sm table-borderless mt-3">
+                    <tr>
+                        <th class="text-muted">Total Leads Captured:</th>
+                        <td class="fw-bold">@Model.TotalLeads</td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">Converted to Customers:</th>
+                        <td class="fw-bold text-success">@Model.ConvertedLeads</td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">Lost / Disqualified:</th>
+                        <td class="fw-bold text-danger">@Model.LostLeads</td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">In Progress / Active:</th>
+                        <td class="fw-bold text-info">@Model.ActiveLeads</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Opportunity Win Rate Card -->
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 border-bottom">
+                <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-trophy-fill text-warning me-2"></i>Opportunity Win Rate &amp; Revenue</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center my-3">
+                    <span class="display-4 fw-bold text-success">@Model.OpportunityWinRate%</span>
+                    <div class="text-muted small">Closed-Won Win Rate</div>
+                </div>
+                <table class="table table-sm table-borderless mt-3">
+                    <tr>
+                        <th class="text-muted">Total Opportunities:</th>
+                        <td class="fw-bold">@Model.TotalOpportunities</td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">Won Deals:</th>
+                        <td class="fw-bold text-success">@Model.WonOpportunities</td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">Lost Deals:</th>
+                        <td class="fw-bold text-danger">@Model.LostOpportunities</td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">Active Pipeline Deals:</th>
+                        <td class="fw-bold text-primary">@Model.ActiveOpportunities</td>
+                    </tr>
+                    <tr class="border-top">
+                        <th class="text-muted">Realized Won Revenue:</th>
+                        <td class="fs-5 fw-bold text-success">$@Model.WonRevenue.ToString("N0")</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

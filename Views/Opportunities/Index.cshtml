@@ -1,0 +1,197 @@
+@model AcxiomCRM.ViewModels.OpportunityListViewModel
+@{
+    ViewData["Title"] = "Opportunity Pipeline";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1 text-dark"><i class="bi bi-briefcase-fill text-primary me-2"></i>Opportunities</h2>
+        <span class="text-muted small">Manage pipeline, stage progression and deal values</span>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i> Add Opportunity
+    </a>
+</div>
+
+<!-- Financial Summary Banner -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card p-3 bg-white border-start border-primary border-4 shadow-sm">
+            <div class="small text-muted text-uppercase fw-semibold">Total Pipeline Value</div>
+            <div class="fs-3 fw-bold text-dark mt-1">$@Model.TotalPipelineValue.ToString("N0")</div>
+            <span class="small text-muted">Sum of active open deals</span>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-3 bg-white border-start border-success border-4 shadow-sm">
+            <div class="small text-muted text-uppercase fw-semibold">Weighted Pipeline Forecast</div>
+            <div class="fs-3 fw-bold text-success mt-1">$@Model.WeightedPipelineValue.ToString("N0")</div>
+            <span class="small text-muted">Derived using (Amount &times; Probability / 100)</span>
+        </div>
+    </div>
+</div>
+
+<!-- Search & Filter Card -->
+<div class="card mb-4 shadow-sm border-0">
+    <div class="card-body">
+        <form method="get" asp-action="Index" class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" value="@Model.SearchTerm" class="form-control" placeholder="Search by deal or customer..." />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="stage" class="form-select">
+                    <option value="">All Stages</option>
+                    <option value="Qualification" selected="@(Model.StageFilter == "Qualification")">Qualification</option>
+                    <option value="Proposal" selected="@(Model.StageFilter == "Proposal")">Proposal</option>
+                    <option value="Negotiation" selected="@(Model.StageFilter == "Negotiation")">Negotiation</option>
+                    <option value="Won" selected="@(Model.StageFilter == "Won")">Won</option>
+                    <option value="Lost" selected="@(Model.StageFilter == "Lost")">Lost</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="Open" selected="@(Model.StatusFilter == "Open")">Open</option>
+                    <option value="Won" selected="@(Model.StatusFilter == "Won")">Won</option>
+                    <option value="Lost" selected="@(Model.StatusFilter == "Lost")">Lost</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-outline-primary">Filter</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Opportunities Table -->
+<div class="card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Opportunity</th>
+                    <th>Customer</th>
+                    <th>Stage</th>
+                    <th>Amount</th>
+                    <th>Probability</th>
+                    <th>Weighted Value</th>
+                    <th>Expected Close</th>
+                    <th>Owner</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Opportunities.Any())
+                {
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">No opportunities found matching your filters.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var o in Model.Opportunities)
+                    {
+                        <tr>
+                            <td class="fw-semibold">
+                                <a asp-action="Details" asp-route-id="@o.OpportunityId" class="text-decoration-none text-dark">@o.OpportunityName</a>
+                            </td>
+                            <td>
+                                @if (o.Customer != null)
+                                {
+                                    <a asp-controller="Customers" asp-action="Details" asp-route-id="@o.CustomerId" class="text-decoration-none">
+                                        @o.Customer.CustomerName
+                                    </a>
+                                }
+                            </td>
+                            <td>
+                                @if (o.Stage == "Won") { <span class="badge bg-success">Won</span> }
+                                else if (o.Stage == "Lost") { <span class="badge bg-danger">Lost</span> }
+                                else if (o.Stage == "Negotiation") { <span class="badge bg-warning text-dark">Negotiation</span> }
+                                else if (o.Stage == "Proposal") { <span class="badge bg-info text-dark">Proposal</span> }
+                                else { <span class="badge bg-secondary">Qualification</span> }
+                            </td>
+                            <td class="fw-bold text-dark">$@o.Amount.ToString("N0")</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="progress flex-grow-1" style="height: 6px; width: 60px;">
+                                        <div class="progress-bar @(o.Probability >= 80 ? "bg-success" : o.Probability >= 40 ? "bg-primary" : "bg-warning")" style="width: @(o.Probability)%"></div>
+                                    </div>
+                                    <span class="small">@o.Probability%</span>
+                                </div>
+                            </td>
+                            <td class="text-muted fw-semibold">$@o.WeightedAmount.ToString("N0")</td>
+                            <td>
+                                @{
+                                    bool isPast = o.ExpectedCloseDate.Date < DateTime.UtcNow.Date && o.Status == "Open";
+                                }
+                                <span class="@(isPast ? "text-danger fw-bold" : "text-muted small")">
+                                    @o.ExpectedCloseDate.ToString("yyyy-MM-dd")
+                                    @(isPast ? " (!)" : "")
+                                </span>
+                            </td>
+                            <td class="small text-muted">@(o.AssignedUser?.FullName ?? "Unassigned")</td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-action="Details" asp-route-id="@o.OpportunityId" class="btn btn-outline-secondary" title="Details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@o.OpportunityId" class="btn btn-outline-primary" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                                    {
+                                        <button type="button" class="btn btn-outline-danger" title="Delete" data-bs-toggle="modal" data-bs-target="#deleteOppModal-@o.OpportunityId">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    }
+                                </div>
+
+                                <!-- Delete Modal -->
+                                <div class="modal fade text-start" id="deleteOppModal-@o.OpportunityId" tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title fw-bold text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Delete Opportunity</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to delete opportunity <strong>@o.OpportunityName</strong> ($@o.Amount.ToString("N0"))?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <form asp-action="Delete" asp-route-id="@o.OpportunityId" method="post">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (Model.TotalPages > 1)
+    {
+        <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
+            <span class="small text-muted">Showing page @Model.CurrentPage of @Model.TotalPages (Total: @Model.TotalCount)</span>
+            <ul class="pagination pagination-sm mb-0">
+                @for (int p = 1; p <= Model.TotalPages; p++)
+                {
+                    <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@p" asp-route-search="@Model.SearchTerm" asp-route-stage="@Model.StageFilter">@p</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+</div>

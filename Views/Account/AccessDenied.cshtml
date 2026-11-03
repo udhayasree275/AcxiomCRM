@@ -1,0 +1,22 @@
+@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 text-center">
+        <div class="card shadow-sm p-5 border-0">
+            <div class="text-danger mb-3">
+                <i class="bi bi-shield-slash-fill" style="font-size: 4rem;"></i>
+            </div>
+            <h2 class="fw-bold text-dark">Access Denied (403)</h2>
+            <p class="text-muted mt-2">
+                You do not have the required permissions or role scope to access this CRM module or action.
+            </p>
+            <div class="mt-4">
+                <a asp-controller="Dashboard" asp-action="Index" class="btn btn-primary px-4">
+                    <i class="bi bi-house-door-fill me-1"></i> Return to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

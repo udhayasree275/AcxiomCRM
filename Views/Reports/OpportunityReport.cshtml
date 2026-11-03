@@ -1,0 +1,57 @@
+@model List<AcxiomCRM.Models.Opportunity>
+@{
+    ViewData["Title"] = "Opportunity Report";
+}
+
+<partial name="_ReportHeader" />
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-dark">Opportunity Pipeline Detail Report</h5>
+        <span class="badge bg-secondary">@Model.Count Deals</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Opportunity Name</th>
+                    <th>Customer</th>
+                    <th>Stage</th>
+                    <th>Amount</th>
+                    <th>Probability</th>
+                    <th>Weighted Value</th>
+                    <th>Expected Close</th>
+                    <th>Status</th>
+                    <th>Sales Owner</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="9" class="text-center py-4 text-muted">No opportunities found.</td></tr>
+                }
+                else
+                {
+                    @foreach (var o in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@o.OpportunityName</td>
+                            <td>@(o.Customer?.CustomerName ?? "None")</td>
+                            <td><span class="badge bg-light text-dark border">@o.Stage</span></td>
+                            <td class="fw-bold text-dark">$@o.Amount.ToString("N0")</td>
+                            <td>@o.Probability%</td>
+                            <td class="fw-bold text-success">$@o.WeightedAmount.ToString("N0")</td>
+                            <td class="small">@o.ExpectedCloseDate.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                @if (o.Status == "Won") { <span class="badge bg-success">Won</span> }
+                                else if (o.Status == "Lost") { <span class="badge bg-danger">Lost</span> }
+                                else { <span class="badge bg-primary">Open</span> }
+                            </td>
+                            <td class="small text-muted">@(o.AssignedUser?.FullName ?? "Unassigned")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

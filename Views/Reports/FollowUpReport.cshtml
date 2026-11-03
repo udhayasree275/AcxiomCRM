@@ -1,0 +1,53 @@
+@model List<AcxiomCRM.Models.FollowUp>
+@{
+    ViewData["Title"] = "Follow-Up Report";
+}
+
+<partial name="_ReportHeader" />
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-dark">Follow-Up &amp; Interaction Tracking Report</h5>
+        <span class="badge bg-secondary">@Model.Count Activities</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Scheduled Date</th>
+                    <th>Type</th>
+                    <th>Subject</th>
+                    <th>Related Account</th>
+                    <th>Status</th>
+                    <th>Assigned User</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="7" class="text-center py-4 text-muted">No follow-ups found for this criteria.</td></tr>
+                }
+                else
+                {
+                    @foreach (var fu in Model)
+                    {
+                        <tr>
+                            <td>@fu.FollowUpDate.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td><span class="badge bg-secondary">@fu.FollowUpType</span></td>
+                            <td class="fw-semibold">@fu.Subject</td>
+                            <td>@(fu.Customer != null ? fu.Customer.CustomerName : fu.Lead?.LeadName ?? "General")</td>
+                            <td>
+                                @if (fu.Status == "Completed") { <span class="badge bg-success">Completed</span> }
+                                else if (fu.Status == "Missed") { <span class="badge bg-danger">Missed</span> }
+                                else { <span class="badge bg-primary">Planned</span> }
+                            </td>
+                            <td>@(fu.AssignedUser?.FullName ?? "Unassigned")</td>
+                            <td class="small text-muted">@fu.Remarks</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

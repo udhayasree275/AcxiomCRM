@@ -1,0 +1,27 @@
+## .NET Build Output
+[Bb]in/
+[Oo]bj/
+
+## Visual Studio & VS Code
+.vs/
+.vscode/
+*.user
+*.suo
+*.userprefs
+
+## Database
+*.db
+*.db-shm
+*.db-wal
+
+## Data Protection Keys (Sensitive local encryption keys)
+DataProtection-Keys/
+
+## Local Portable Runtime & Package Caches
+.dotnet_home/
+.nuget_packages/
+
+## OS generated files
+Thumbs.db
+Desktop.ini
+.DS_Store

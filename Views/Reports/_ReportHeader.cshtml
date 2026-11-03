@@ -1,0 +1,102 @@
+@{
+    var filter = (AcxiomCRM.ViewModels.ReportFilterViewModel)ViewBag.Filter;
+    string userRole = (string)ViewBag.UserRole;
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h2 class="fw-bold mb-1 text-dark"><i class="bi bi-bar-chart-line-fill text-primary me-2"></i>CRM Intelligence Reports</h2>
+        <span class="text-muted small">Analyze pipeline velocity, conversion ratios, customer status and sales activities</span>
+    </div>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-outline-secondary" onclick="window.print();">
+            <i class="bi bi-printer me-1"></i> Print
+        </button>
+        <a asp-action="ExportCsv"
+           asp-route-type="@filter.ReportType"
+           asp-route-fromDate="@(filter.FromDate?.ToString("yyyy-MM-dd"))"
+           asp-route-toDate="@(filter.ToDate?.ToString("yyyy-MM-dd"))"
+           asp-route-status="@filter.Status"
+           asp-route-ownerId="@filter.OwnerId"
+           class="btn btn-success fw-semibold">
+            <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export to CSV
+        </a>
+    </div>
+</div>
+
+<!-- Report Navigation Tabs -->
+<div class="card mb-4 shadow-sm border-0">
+    <div class="card-header bg-white border-bottom pb-0">
+        <ul class="nav nav-tabs card-header-tabs">
+            <li class="nav-item">
+                <a class="nav-link @(filter.ReportType == "pipeline" ? "active fw-bold" : "")" asp-action="Index" asp-route-type="pipeline">
+                    <i class="bi bi-funnel me-1"></i> Pipeline Report
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(filter.ReportType == "customer" ? "active fw-bold" : "")" asp-action="Index" asp-route-type="customer">
+                    <i class="bi bi-people me-1"></i> Customer Report
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(filter.ReportType == "lead" ? "active fw-bold" : "")" asp-action="Index" asp-route-type="lead">
+                    <i class="bi bi-person-lines-fill me-1"></i> Lead Report
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(filter.ReportType == "opportunity" ? "active fw-bold" : "")" asp-action="Index" asp-route-type="opportunity">
+                    <i class="bi bi-briefcase me-1"></i> Opportunity Report
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(filter.ReportType == "followup" ? "active fw-bold" : "")" asp-action="Index" asp-route-type="followup">
+                    <i class="bi bi-calendar-check me-1"></i> Follow-Up Report
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(filter.ReportType == "conversion" ? "active fw-bold" : "")" asp-action="Index" asp-route-type="conversion">
+                    <i class="bi bi-arrow-repeat me-1"></i> Conversion Report
+                </a>
+            </li>
+            @if (userRole == "Admin" || userRole == "Manager")
+            {
+                <li class="nav-item">
+                    <a class="nav-link @(filter.ReportType == "useractivity" ? "active fw-bold" : "")" asp-action="Index" asp-route-type="useractivity">
+                        <i class="bi bi-activity me-1"></i> User Activity
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(filter.ReportType == "audit" ? "active fw-bold" : "")" asp-action="Index" asp-route-type="audit">
+                        <i class="bi bi-shield-check me-1"></i> Audit Report
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+    <div class="card-body">
+        <form method="get" asp-action="Index" class="row g-2 align-items-center">
+            <input type="hidden" name="type" value="@filter.ReportType" />
+            <div class="col-md-3">
+                <label class="form-label smaller text-muted mb-0">From Date</label>
+                <input type="date" name="fromDate" value="@(filter.FromDate?.ToString("yyyy-MM-dd"))" class="form-control form-control-sm" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label smaller text-muted mb-0">To Date</label>
+                <input type="date" name="toDate" value="@(filter.ToDate?.ToString("yyyy-MM-dd"))" class="form-control form-control-sm" />
+            </div>
+            @if (userRole == "Admin" || userRole == "Manager")
+            {
+                <div class="col-md-3">
+                    <label class="form-label smaller text-muted mb-0">Sales Executive</label>
+                    <select name="ownerId" asp-items="filter.SalesExecutives" class="form-select form-select-sm">
+                        <option value="">All Sales Executives</option>
+                    </select>
+                </div>
+            }
+            <div class="col-md-3 d-flex gap-2 align-self-end">
+                <button type="submit" class="btn btn-sm btn-primary">Apply Filter</button>
+                <a asp-action="Index" asp-route-type="@filter.ReportType" class="btn btn-sm btn-outline-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>

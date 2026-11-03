@@ -1,0 +1,125 @@
+@model AcxiomCRM.ViewModels.LeadConvertViewModel
+@{
+    ViewData["Title"] = $"Convert Lead - {Model.LeadName}";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow border-0">
+            <div class="card-header bg-success text-white py-3">
+                <h5 class="fw-bold mb-0">
+                    <i class="bi bi-arrow-repeat me-2"></i>Lead Conversion Workflow
+                </h5>
+                <span class="small text-white-50">Convert prospect @Model.LeadName (@Model.LeadCode) into an active Customer Account</span>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Convert" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="LeadId" />
+                    <input type="hidden" asp-for="LeadCode" />
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                    <!-- Customer Account Information -->
+                    <h6 class="fw-bold text-dark text-uppercase small mb-3 border-bottom pb-2">
+                        <i class="bi bi-building me-1 text-primary"></i> 1. New Customer Master Information
+                    </h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label asp-for="CompanyName" class="form-label fw-semibold small required">Company Name</label>
+                            <input asp-for="CompanyName" class="form-control" />
+                            <span asp-validation-for="CompanyName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="LeadName" class="form-label fw-semibold small required">Primary Contact Name</label>
+                            <input asp-for="LeadName" class="form-control" />
+                            <span asp-validation-for="LeadName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label fw-semibold small required">Account Email</label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Phone" class="form-label fw-semibold small required">Account Phone</label>
+                            <input asp-for="Phone" class="form-control" maxlength="10" />
+                            <span asp-validation-for="Phone" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Address" class="form-label fw-semibold small">Address</label>
+                            <input asp-for="Address" class="form-control" placeholder="Street Address" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="City" class="form-label fw-semibold small">City</label>
+                            <input asp-for="City" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="State" class="form-label fw-semibold small">State</label>
+                            <input asp-for="State" class="form-control" />
+                        </div>
+                    </div>
+
+                    <!-- Opportunity Generation Options -->
+                    <h6 class="fw-bold text-dark text-uppercase small mb-3 border-bottom pb-2">
+                        <i class="bi bi-briefcase-fill me-1 text-success"></i> 2. Sales Opportunity Pipeline (Optional)
+                    </h6>
+                    <div class="form-check form-switch mb-3">
+                        <input asp-for="CreateOpportunity" class="form-check-input" id="toggleOppSwitch" />
+                        <label asp-for="CreateOpportunity" class="form-check-label fw-semibold text-dark">Also create a sales opportunity deal</label>
+                    </div>
+
+                    <div id="oppFields" class="row g-3 p-3 bg-light rounded mb-4">
+                        <div class="col-12">
+                            <label asp-for="OpportunityName" class="form-label fw-semibold small"></label>
+                            <input asp-for="OpportunityName" class="form-control" />
+                            <span asp-validation-for="OpportunityName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="OpportunityAmount" class="form-label fw-semibold small required"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="OpportunityAmount" class="form-control" type="number" step="0.01" min="1" />
+                            </div>
+                            <span asp-validation-for="OpportunityAmount" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="OpportunityStage" class="form-label fw-semibold small required">Initial Stage</label>
+                            <select asp-for="OpportunityStage" class="form-select">
+                                <option value="Qualification">Qualification</option>
+                                <option value="Proposal">Proposal</option>
+                                <option value="Negotiation">Negotiation</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="OpportunityProbability" class="form-label fw-semibold small required">Probability (%)</label>
+                            <input asp-for="OpportunityProbability" class="form-control" type="number" min="0" max="100" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ExpectedCloseDate" class="form-label fw-semibold small required">Expected Close Date</label>
+                            <input asp-for="ExpectedCloseDate" class="form-control" type="date" />
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a asp-action="Details" asp-route-id="@Model.LeadId" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-success px-4 fw-semibold">
+                            <i class="bi bi-check-circle-fill me-1"></i> Complete Conversion
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const toggleSwitch = document.getElementById('toggleOppSwitch');
+        const oppFields = document.getElementById('oppFields');
+        if (toggleSwitch && oppFields) {
+            toggleSwitch.addEventListener('change', function () {
+                oppFields.style.display = this.checked ? 'flex' : 'none';
+            });
+        }
+    </script>
+}

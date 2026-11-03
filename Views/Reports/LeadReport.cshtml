@@ -1,0 +1,69 @@
+@model List<AcxiomCRM.Models.Lead>
+@{
+    ViewData["Title"] = "Lead Report";
+}
+
+<partial name="_ReportHeader" />
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-dark">Lead Source &amp; Conversion Report</h5>
+        <span class="badge bg-secondary">@Model.Count Leads</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Lead Code</th>
+                    <th>Prospect Name</th>
+                    <th>Company</th>
+                    <th>Source</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Expected Value</th>
+                    <th>Owner</th>
+                    <th>Converted Customer</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="9" class="text-center py-4 text-muted">No lead records found.</td></tr>
+                }
+                else
+                {
+                    @foreach (var l in Model)
+                    {
+                        <tr>
+                            <td><span class="badge bg-light text-dark border">@l.LeadCode</span></td>
+                            <td class="fw-semibold">@l.LeadName</td>
+                            <td>@l.CompanyName</td>
+                            <td>@l.Source</td>
+                            <td>
+                                @if (l.Status == "Converted") { <span class="badge bg-success">Converted</span> }
+                                else if (l.Status == "Qualified") { <span class="badge bg-info text-dark">Qualified</span> }
+                                else if (l.Status == "Lost") { <span class="badge bg-danger">Lost</span> }
+                                else { <span class="badge bg-primary">@l.Status</span> }
+                            </td>
+                            <td>@l.Priority</td>
+                            <td class="fw-bold">$@l.ExpectedValue.ToString("N0")</td>
+                            <td>@(l.AssignedUser?.FullName ?? "Unassigned")</td>
+                            <td>
+                                @if (l.ConvertedCustomer != null)
+                                {
+                                    <span class="badge bg-light text-success border border-success">
+                                        <i class="bi bi-building me-1"></i>@l.ConvertedCustomer.CustomerName
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">-</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,48 @@
+@model List<AcxiomCRM.ViewModels.PipelineReportItem>
+@{
+    ViewData["Title"] = "Pipeline Report";
+}
+
+<partial name="_ReportHeader" />
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-dark">Stage-wise &amp; Owner-wise Pipeline Analysis</h5>
+        <div>
+            <span class="badge bg-primary fs-6 me-2">Total: $@Model.Sum(x => x.TotalAmount).ToString("N0")</span>
+            <span class="badge bg-success fs-6">Weighted: $@Model.Sum(x => x.WeightedAmount).ToString("N0")</span>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Pipeline Stage</th>
+                    <th>Sales Owner</th>
+                    <th>Deals Count</th>
+                    <th>Nominal Pipeline Amount</th>
+                    <th>Weighted Value (Amount &times; Probability)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="5" class="text-center py-4 text-muted">No pipeline records in this reporting period.</td></tr>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="badge bg-light text-dark border">@item.Stage</span></td>
+                            <td class="fw-semibold">@item.OwnerName</td>
+                            <td><span class="badge bg-secondary">@item.Count deals</span></td>
+                            <td class="fw-bold text-dark">$@item.TotalAmount.ToString("N0")</td>
+                            <td class="fw-bold text-success">$@item.WeightedAmount.ToString("N0")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

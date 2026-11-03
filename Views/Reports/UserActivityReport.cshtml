@@ -1,0 +1,49 @@
+@model List<AcxiomCRM.ViewModels.UserActivityReportItem>
+@{
+    ViewData["Title"] = "User Activity Report";
+}
+
+<partial name="_ReportHeader" />
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-dark">Team Productivity &amp; User Activity Report</h5>
+        <span class="badge bg-secondary">@Model.Count Team Members</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>Leads Assigned</th>
+                    <th>Opportunities</th>
+                    <th>Follow-Ups Logged</th>
+                    <th>Activities Performed</th>
+                    <th>System Logins</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="7" class="text-center py-4 text-muted">No user activity recorded.</td></tr>
+                }
+                else
+                {
+                    @foreach (var u in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold text-dark">@u.UserName</td>
+                            <td><span class="badge bg-light text-dark border">@u.Role</span></td>
+                            <td><span class="badge bg-info text-dark">@u.LeadsCount</span></td>
+                            <td><span class="badge bg-warning text-dark">@u.OpportunitiesCount</span></td>
+                            <td><span class="badge bg-primary">@u.FollowUpsCount</span></td>
+                            <td><span class="badge bg-success">@u.ActivitiesCount</span></td>
+                            <td><span class="badge bg-secondary">@u.LoginsCount</span></td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

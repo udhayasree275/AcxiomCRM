@@ -1,0 +1,52 @@
+@model List<AcxiomCRM.Models.AuditLog>
+@{
+    ViewData["Title"] = "Security & Business Audit Report";
+}
+
+<partial name="_ReportHeader" />
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-dark">Security Events &amp; Compliance Audit Report</h5>
+        <span class="badge bg-secondary">@Model.Count Audit Entries</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 font-monospace small">
+            <thead>
+                <tr>
+                    <th>Timestamp (UTC)</th>
+                    <th>User</th>
+                    <th>Module</th>
+                    <th>Action</th>
+                    <th>Record ID</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="6" class="text-center py-4 text-muted font-sans-serif">No audit entries found.</td></tr>
+                }
+                else
+                {
+                    @foreach (var a in Model)
+                    {
+                        <tr>
+                            <td>@a.CreatedDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                            <td>@(a.UserEmail ?? "System")</td>
+                            <td><span class="badge bg-light text-dark border">@a.EntityName</span></td>
+                            <td>
+                                @if (a.Action == "Login") { <span class="badge bg-success">Login</span> }
+                                else if (a.Action == "Failed Login") { <span class="badge bg-danger">Failed Login</span> }
+                                else if (a.Action == "Lockout") { <span class="badge bg-danger-subtle text-danger border border-danger">Lockout</span> }
+                                else { <span class="badge bg-secondary">@a.Action</span> }
+                            </td>
+                            <td>@(a.RecordId ?? "-")</td>
+                            <td>@a.NewValue</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

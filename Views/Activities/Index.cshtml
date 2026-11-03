@@ -1,0 +1,138 @@
+@model AcxiomCRM.ViewModels.ActivityListViewModel
+@{
+    ViewData["Title"] = "Activity Management";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1 text-dark"><i class="bi bi-list-task text-primary me-2"></i>Activities</h2>
+        <span class="text-muted small">Log and review sales interactions: calls, meetings, emails &amp; tasks</span>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i> Log Activity
+    </a>
+</div>
+
+<!-- Filter Card -->
+<div class="card mb-4 shadow-sm border-0">
+    <div class="card-body">
+        <form method="get" asp-action="Index" class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" value="@Model.SearchTerm" class="form-control" placeholder="Search subject, description..." />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="type" class="form-select">
+                    <option value="">All Types</option>
+                    <option value="Call" selected="@(Model.TypeFilter == "Call")">Call</option>
+                    <option value="Meeting" selected="@(Model.TypeFilter == "Meeting")">Meeting</option>
+                    <option value="Email" selected="@(Model.TypeFilter == "Email")">Email</option>
+                    <option value="Task" selected="@(Model.TypeFilter == "Task")">Task</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="Planned" selected="@(Model.StatusFilter == "Planned")">Planned</option>
+                    <option value="In Progress" selected="@(Model.StatusFilter == "In Progress")">In Progress</option>
+                    <option value="Completed" selected="@(Model.StatusFilter == "Completed")">Completed</option>
+                    <option value="Cancelled" selected="@(Model.StatusFilter == "Cancelled")">Cancelled</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-outline-primary w-100">Filter</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Activity Table -->
+<div class="card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Subject</th>
+                    <th>Related To</th>
+                    <th>Assigned To</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Activities.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No activities found matching filters.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var a in Model.Activities)
+                    {
+                        <tr>
+                            <td><span class="small fw-semibold text-dark">@a.ActivityDate.ToString("yyyy-MM-dd HH:mm")</span></td>
+                            <td>
+                                <span class="badge @(a.ActivityType == "Call" ? "bg-info text-dark" : a.ActivityType == "Meeting" ? "bg-primary" : a.ActivityType == "Email" ? "bg-warning text-dark" : "bg-secondary")">
+                                    @a.ActivityType
+                                </span>
+                            </td>
+                            <td>
+                                <strong class="text-dark">@a.Subject</strong>
+                                @if (!string.IsNullOrEmpty(a.Description))
+                                {
+                                    <div class="text-muted smaller">@a.Description</div>
+                                }
+                            </td>
+                            <td>
+                                @if (a.Customer != null)
+                                {
+                                    <a asp-controller="Customers" asp-action="Details" asp-route-id="@a.CustomerId" class="text-decoration-none">
+                                        <i class="bi bi-building me-1"></i>@a.Customer.CustomerName
+                                    </a>
+                                }
+                                else if (a.Lead != null)
+                                {
+                                    <a asp-controller="Leads" asp-action="Details" asp-route-id="@a.LeadId" class="text-decoration-none text-info">
+                                        <i class="bi bi-funnel me-1"></i>@a.Lead.LeadName
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">None</span>
+                                }
+                            </td>
+                            <td class="small text-muted">@(a.AssignedUser?.FullName ?? "Unassigned")</td>
+                            <td>
+                                @if (a.Status == "Completed") { <span class="badge bg-success">Completed</span> }
+                                else if (a.Status == "In Progress") { <span class="badge bg-warning text-dark">In Progress</span> }
+                                else { <span class="badge bg-primary">@a.Status</span> }
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-action="Edit" asp-route-id="@a.ActivityId" class="btn btn-outline-primary" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                                    {
+                                        <form asp-action="Delete" asp-route-id="@a.ActivityId" method="post" class="d-inline" onsubmit="return confirm('Delete this activity?');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
