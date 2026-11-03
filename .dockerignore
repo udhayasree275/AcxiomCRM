@@ -1,0 +1,11 @@
+**/.git
+**/.vs
+**/.vscode
+**/bin
+**/obj
+**/*.db-shm
+**/*.db-wal
+**/DataProtection-Keys
+.git_tools
+.dotnet_home
+.nuget_packages

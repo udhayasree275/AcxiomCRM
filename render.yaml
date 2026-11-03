@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: acxiomcrm
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /Account/Login

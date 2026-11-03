@@ -12,6 +12,13 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Cloud / Render Hosting: Automatically bind to Render's dynamic PORT
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+{
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
+
 // Data Protection: Persist keys within workspace directory
 var keysFolder = Path.Combine(builder.Environment.ContentRootPath, "DataProtection-Keys");
 builder.Services.AddDataProtection()
